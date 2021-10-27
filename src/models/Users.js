@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
@@ -23,6 +24,23 @@ const UserSchema = new mongoose.Schema({
   resetPasswordExpire:Date
 });
 
+//before a user is saved.
+UserSchema.pre("save", async function (next) {
+  let salt;
+  if (!this.isModified("password")) {
+    next();
+  } else {
+    salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password,
+      salt);
+    next();
+  }
+});
+
+//compare db password with given password
+UserSchema.methods.match = async (password) => {
+  
+}
 //create user
 const User = mongoose.model("User", UserSchema);
 

@@ -8,7 +8,7 @@ async function register(req, res, next) {
       username, email, password
     });
     return res.status(200).json({
-      success: "registration successful",
+      message: "registration successful",
       user,
     });
   } catch (error) {
@@ -20,8 +20,30 @@ async function register(req, res, next) {
   
 };
 
-function login(req, res, next) {
-  return res.send("Login Route").status(200);
+async function login(req, res, next) {
+  const { email, password, username } = req.body;
+  if (!email || !password || !username) {
+    return res.status(400).json({
+      success:false,
+      message: 'Please provide an email or username and a password',
+    })
+  } else {
+    try {
+      const user = await User.findOne({ email }).select('+password');
+
+          if (!user) {
+            return res.status(404).json({
+              error: true,
+              message: (`Invalid credentials`)
+            });
+          else {
+              
+            }
+      }
+    } catch (error) {
+      
+    }
+  }
 };
 
 function forgotPassword(req, res, next) {
