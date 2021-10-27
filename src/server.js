@@ -1,13 +1,15 @@
 require('dotenv').config({ path: './.env'});
 const express = require('express');
-const authRouter=require('./routes/authRouter')
+const authRouter = require('./routes/authRouter');
+const privateRoute=require('./routes/private')
 const { connectDB } = require('./config/db')
 const app = express();
-const errorHandler=require('./middleware/error')
+const errorHandler = require('./middleware/error');
 
 app.use(express.json());
 
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/private', privateRoute);
 
 const PORT = process.env.PORT || 5000;
 
