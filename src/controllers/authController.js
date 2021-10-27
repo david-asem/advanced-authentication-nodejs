@@ -7,8 +7,9 @@ async function register(req, res, next) {
     const user = await User.create({
       username, email, password
     });
-    return res.status(200).json({
-      message: "registration successful",
+    return res.status(201).json({
+      success: true,
+      message:'registration successful',
       user,
     });
   } catch (error) {
@@ -20,12 +21,13 @@ async function register(req, res, next) {
   
 };
 
+//login function
 async function login(req, res, next) {
-  const { email, password, username } = req.body;
-  if (!email || !password || !username) {
+  const { email, password} = req.body;
+  if (!email || !password) {
     return res.status(400).json({
-      success:false,
-      message: 'Please provide an email or username and a password',
+      error:true,
+      message: 'Please provide an email and a password',
     })
   } else {
     try {
@@ -36,12 +38,28 @@ async function login(req, res, next) {
               error: true,
               message: (`Invalid credentials`)
             });
-          else {
-              
+          }
+      else {
+            const isMatch = await user.matchPasswords(password);
+            if (!isMatch) {
+              return res.status(404).json({
+                error: true,
+                message:'Invalid credentials'
+              })
+            }     else {
+                  return res.status(200).json({
+                    success: true,
+                    message: 'login successful',
+                    token:'79998hjehejw',
+                    });
+                  }
             }
-      }
     } catch (error) {
-      
+      return res.status(500).json({
+        error: true,
+        message:error.message('There was a server error'),
+        
+      })
     }
   }
 };

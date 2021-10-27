@@ -38,9 +38,9 @@ UserSchema.pre("save", async function (next) {
 });
 
 //compare db password with given password
-UserSchema.methods.match = async (password) => {
-  
-}
+UserSchema.methods.matchPasswords = async function(password){
+  return await bcrypt.compare(password, this.password)
+};
 //create user
 const User = mongoose.model("User", UserSchema);
 
