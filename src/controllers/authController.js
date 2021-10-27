@@ -1,11 +1,11 @@
 const User = require('../models/Users');
-
+const ErrorHandlers = require('../services/errorHandlers');
 //route functions
 async function register(req, res, next) {
   const { username, email, password } = req.body;
   try {
     const user = await User.create({
-      username, email, password
+      username, email, password,
     });
     return res.status(201).json({
       success: true,
@@ -13,10 +13,7 @@ async function register(req, res, next) {
       user,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    })
+    next(error);
   }
   
 };
@@ -25,27 +22,18 @@ async function register(req, res, next) {
 async function login(req, res, next) {
   const { email, password} = req.body;
   if (!email || !password) {
-    return res.status(400).json({
-      error:true,
-      message: 'Please provide an email and a password',
-    })
+    return next(new ErrorHandlers('Please provide an email and a password', 400));
   } else {
     try {
       const user = await User.findOne({ email }).select('+password');
 
           if (!user) {
-            return res.status(404).json({
-              error: true,
-              message: (`Invalid credentials`)
-            });
+            return next(new ErrorHandlers('Invalide credentials', 401));
           }
       else {
             const isMatch = await user.matchPasswords(password);
             if (!isMatch) {
-              return res.status(404).json({
-                error: true,
-                message:'Invalid credentials'
-              })
+              return next(new ErrorHandlers('Invalid credentials', 401));
             }     else {
                   return res.status(200).json({
                     success: true,
