@@ -1,7 +1,23 @@
-//route functions
+const User = require('../models/Users');
 
-function register(req, res, next) {
-  return res.send('Register route').status(200);
+//route functions
+async function register(req, res, next) {
+  const { username, email, password } = req.body;
+  try {
+    const user = await User.create({
+      username, email, password
+    });
+    return res.status(200).json({
+      success: "registration successful",
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    })
+  }
+  
 };
 
 function login(req, res, next) {
