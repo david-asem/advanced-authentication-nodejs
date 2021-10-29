@@ -1,4 +1,5 @@
 const User = require('../models/Users');
+const sendEmail = require('../services/sendEmail');
 const ErrorHandlers = require('../services/errorHandlers');
 //route functions
 async function register(req, res, next) {
@@ -57,7 +58,7 @@ async function forgotPassword(req, res, next) {
     }
 
     else {
-      const resetToken = user.getResetPasswordToken();
+      const resetToken = await user.getResetPasswordToken();
 
       await user.save();
       const resetUrl = `http://localhost:3000/passwordreset/${resetToken}`;
@@ -67,14 +68,30 @@ async function forgotPassword(req, res, next) {
         <p>Please go to this link to reset yout password </p>
         <a href =${resetUrl} clicktracking=off>${resetUrl}</a>
         `
-    }
-    try {
-      
+      try {
+        await sendEmail({
+          to: user.email,
+          subject: "Password Reset Request",
+          text: message
+        });
+
+      return res.status(200).json(
+        {
+          success: true,
+          data: "Email sent"
+        })
     } catch (error) {
+        user.resetPasswordToken = undefined,
+        user.resetPasswordExpire = undefined,
+        
+        await user.save();
       
+      return next(new ErrorHandlers('Email could not be sent', 500))
+      };  
     }
-  } catch (error) {
     
+  } catch (error) {
+    next(error)
   }
 };
 
