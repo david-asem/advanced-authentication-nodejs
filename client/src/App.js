@@ -1,24 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
-function App() {
+import privateRoute from './components/routing/privateRoute';
+
+import { PrivateScreen, LoginScreen, RegisterScreen, ForgotPasswordScreen, PasswordResetScreen } from './components/screens';
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    
+      <Router>
+      <div className="app">
+        <Switch>
+          <privateRoute exact path="/" component{PrivateScreen}/>
+          <Route exact path="/register" component={RegisterScreen} />
+          <Route exact path="/login" component={LoginScreen} />
+          <Route exact path="/forgotpassword" component={ForgotPasswordScreen} />
+          <Route exact path="/passwordreset/:resetToken" component={PasswordResetScreen} />
+
+          
+        </Switch>
+      </div>
+      </Router>
+  
   );
 }
 

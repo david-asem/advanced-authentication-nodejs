@@ -97,7 +97,7 @@ async function forgotPassword(req, res, next) {
 };
 
 async function resetPassword(req, res, next) {
-  const resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  const resetPasswordToken = crypto.createHash('sha256').update(req.params.resetToken).digest('hex');
 
   try {
     const user = await User.findOne({

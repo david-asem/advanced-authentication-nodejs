@@ -24,8 +24,8 @@ async function startServer() {
   });
   
   process.on('unhandledRejection', (err, promise) => {
-    (console.log(`Error: ${err}`))
-    (server.close(() => process.exit(1)));  
+    console.log(`Error: ${err}`);
+    server.close(() => process.exit(1));  
   })
 }
 
