@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import "./RegisterScreen.css";
@@ -10,6 +10,12 @@ const RegisterScreen = ({history}) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+
+   useEffect(() => {
+    if (localStorage.getItem("authToken")) {
+      history.push("/");
+    }
+  },[history])
 
   const registerHandler = async (e) => {
     const config = {
@@ -52,7 +58,8 @@ const RegisterScreen = ({history}) => {
     <form onSubmit={registerHandler} className="register-screen">
       <h3 className="register-screen_title">
         Register Account
-      </h3>
+        </h3>
+        {error && <span className="error-message">{error}</span>}
       <div className="form-group">
         <label htmlFor="name">Username:</label>
         <input type="text" required id="name" placeholder="Enter a username" value="{username}" onChange={(e)=>setUsername(e.target.value)} />
