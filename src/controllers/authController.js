@@ -1,6 +1,7 @@
 const User = require('../models/Users');
 const sendEmail = require('../services/sendEmail');
 const ErrorHandlers = require('../services/errorHandlers');
+const crypto = require('crypto');
 //route functions
 async function register(req, res, next) {
   const { username, email, password } = req.body;
@@ -95,7 +96,33 @@ async function forgotPassword(req, res, next) {
   }
 };
 
-function resetPassword(req, res, next) {
+async function resetPassword(req, res, next) {
+  const resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return next(new ErrorHandlers('Invalid Reset Token', 400));
+    }
+
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message:'Password Reset Success',
+    })
+  } catch (error) {
+    next(error);
+  }
+
   return res.send("Reset Password Route").status(200);
 };
 
